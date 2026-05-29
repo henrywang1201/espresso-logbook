@@ -1,0 +1,22 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="42%" cy="34%" r="80%">
+      <stop offset="0%" stop-color="#f6eedf"/>
+      <stop offset="100%" stop-color="#e3d6c0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g transform="translate(256,256)" fill="none" stroke="#a96a39" stroke-width="11" stroke-linecap="round">
+    <line x1="0" y1="-163.8" x2="0" y2="-132.6"/>
+    <line x1="115.4" y1="-115.4" x2="93.6" y2="-93.6"/>
+    <line x1="163.8" y1="0" x2="132.6" y2="0"/>
+    <line x1="115.4" y1="115.4" x2="93.6" y2="93.6"/>
+    <line x1="-115.4" y1="115.4" x2="-93.6" y2="93.6"/>
+    <line x1="-163.8" y1="0" x2="-132.6" y2="0"/>
+    <line x1="-115.4" y1="-115.4" x2="-93.6" y2="-93.6"/>
+  </g>
+  <circle cx="256" cy="256" r="117" fill="#fcf8f1" stroke="#e5d8c4" stroke-width="5"/>
+  <text x="256" y="270" font-family="'DM Mono', monospace" font-size="74" font-weight="500" fill="#2a211a" text-anchor="middle">18</text>
+  <text x="256" y="312" font-family="'Spectral', serif" font-size="24" fill="#6c5a49" text-anchor="middle">粉量 g</text>
+  <circle cx="388.6" cy="256" r="13" fill="#a96a39" stroke="#fff" stroke-width="4"/>
+</svg>

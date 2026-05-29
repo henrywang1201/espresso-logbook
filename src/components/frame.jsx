@@ -1,0 +1,135 @@
+// espresso-logbook — responsive phone frame + bottom nav + shared bits
+import { useState, useEffect } from 'react';
+import { C, ratioOf } from '../theme.js';
+
+export { ratioOf };
+
+/* Centered device that scales to fit any viewport (phone / iPad / desktop). */
+export function DeviceFrame({ children }) {
+  const W = 390, H = 844;
+  const [scale, setScale] = useState(1);
+  const [bare, setBare] = useState(false);
+  useEffect(() => {
+    const fit = () => {
+      const pad = window.innerWidth < 480 ? 0 : 48;
+      const s = Math.min((window.innerWidth - pad) / W, (window.innerHeight - pad) / H, 1.08);
+      setScale(s);
+      setBare(s < 1.07 && window.innerWidth < 480);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, []);
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: `radial-gradient(circle at 50% 30%, #efe6d6, #e3d6c0)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+    }}>
+      <div style={{
+        width: W, height: H, transform: `scale(${scale})`, transformOrigin: 'center center',
+        borderRadius: bare ? 0 : 46, overflow: 'hidden', position: 'relative',
+        background: C.bg, flex: '0 0 auto',
+        boxShadow: bare ? 'none' : '0 40px 90px -20px rgba(42,33,26,0.45), 0 0 0 11px #211a13, 0 0 0 13px #3a2c20',
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* Status bar (light/dark) */
+export function SBar({ dark }) {
+  const col = dark ? '#fff' : C.ink;
+  return (
+    <div style={{ height: 48, flex: '0 0 48px', display: 'flex', alignItems: 'center',
+      justifyContent: 'space-between', padding: '0 28px 0 30px', fontFamily: 'var(--mono)', fontSize: 14.5, color: col }}>
+      <span style={{ fontWeight: 500 }}>8:42</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11" fill={col}><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="0.5" y="0.5" width="18" height="10" rx="3" stroke={col} opacity="0.5"/><rect x="2" y="2" width="13" height="7" rx="1.5" fill={col}/><rect x="19.5" y="3.5" width="1.6" height="4" rx="0.8" fill={col} opacity="0.5"/></svg>
+      </div>
+    </div>
+  );
+}
+
+/* Bottom nav */
+const NAV = [
+  { id: 'record', label: '记录', icon: (a) => <DialIcon on={a} /> },
+  { id: 'recipes', label: '配方', icon: (a) => <CupIcon on={a} /> },
+  { id: 'history', label: '历史', icon: (a) => <ListIcon on={a} /> },
+  { id: 'beans', label: '豆子', icon: (a) => <BeanIcon on={a} /> },
+];
+export function BottomNav({ tab, setTab }) {
+  return (
+    <div style={{ flex: '0 0 auto', display: 'flex', padding: '8px 18px 30px', background: C.paper,
+      borderTop: `1px solid ${C.line}`, gap: 6 }}>
+      {NAV.map((n) => {
+        const on = n.id === tab;
+        return (
+          <button key={n.id} onClick={() => setTab(n.id)} style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '8px 0',
+            color: on ? C.caramel : C.taupe, transition: 'color .16s',
+          }}>
+            {n.icon(on)}
+            <span style={{ fontSize: 11, fontWeight: on ? 700 : 500 }}>{n.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* App bar */
+export function Bar({ title, sub, left, right }) {
+  return (
+    <div style={{ flex: '0 0 auto', padding: '2px 20px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ width: 40 }}>{left}</div>
+      <div style={{ flex: 1, textAlign: 'center' }}>
+        <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 600, color: C.ink, lineHeight: 1.05 }}>{title}</div>
+        {sub && <div style={{ fontSize: 11, color: C.taupe, marginTop: 2, fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>{sub}</div>}
+      </div>
+      <div style={{ width: 40, display: 'flex', justifyContent: 'flex-end' }}>{right}</div>
+    </div>
+  );
+}
+export function RoundBtn({ children, onClick, solid }) {
+  return (
+    <button onClick={onClick} style={{ width: 40, height: 40, borderRadius: 13, display: 'flex', alignItems: 'center',
+      justifyContent: 'center', background: solid ? C.ink : 'transparent', color: solid ? '#fff' : C.cocoa,
+      border: solid ? 'none' : `1px solid ${C.line}` }}>{children}</button>
+  );
+}
+
+/* Score chip */
+export function ScoreChip({ s }) {
+  const col = s >= 8 ? C.good : s >= 6 ? C.caramel : C.warn;
+  return (
+    <span className="cd-num" style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 9px',
+      borderRadius: 8, background: col, color: '#fff', fontSize: 13, fontWeight: 500 }}>
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="#fff"><path d="M5.5 0l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7L2.3 10l.6-3.6L.3 3.8l3.6-.5z"/></svg>
+      {s}.0
+    </span>
+  );
+}
+
+/* Bean dot with glyph */
+export function BeanDot({ color, size = 38 }) {
+  return (
+    <span style={{ width: size, height: size, borderRadius: size * 0.28, background: color, flex: '0 0 auto',
+      display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <svg width={size * 0.52} height={size * 0.52} viewBox="0 0 20 20" fill="none">
+        <ellipse cx="10" cy="10" rx="6.5" ry="8.5" stroke="#fff" strokeWidth="1.4" opacity="0.9"/>
+        <path d="M10 2.5C7 6 7 14 10 17.5" stroke="#fff" strokeWidth="1.4" opacity="0.9"/>
+      </svg>
+    </span>
+  );
+}
+
+/* icons */
+export function DialIcon({ on }) { return <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={on ? 2.2 : 1.9}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3" strokeLinecap="round"/></svg>; }
+export function ListIcon({ on }) { return <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={on ? 2.2 : 1.9} strokeLinecap="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>; }
+export function BeanIcon({ on }) { return <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={on ? 2.2 : 1.9}><ellipse cx="12" cy="12" rx="7.5" ry="9.5"/><path d="M12 3C8.5 7 8.5 17 12 21" strokeLinecap="round"/></svg>; }
+export function CupIcon({ on }) { return <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={on ? 2.2 : 1.9} strokeLinejoin="round"><path d="M6 4h12l-1.3 15a2 2 0 0 1-2 1.8H9.3a2 2 0 0 1-2-1.8z"/><path d="M6.6 10h10.8" strokeLinecap="round"/></svg>; }
+export function Chev() { return <svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M7 1L1.5 7.5 7 14"/></svg>; }
+export function Plus() { return <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round"><path d="M9 2v14M2 9h14"/></svg>; }
+export function Dots3() { return <svg width="4" height="16" viewBox="0 0 4 16" fill="currentColor"><circle cx="2" cy="2" r="2"/><circle cx="2" cy="8" r="2"/><circle cx="2" cy="14" r="2"/></svg>; }
