@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { C, ratioOf } from '../theme.js';
 import { beanById } from '../data.js';
-import { Bar, BeanDot, ScoreChip } from './frame.jsx';
+import { Bar, BeanDot, ScoreChip, TrashIcon, Confirm } from './frame.jsx';
 
-export function HistoryScreen({ beans, brews }) {
+export function HistoryScreen({ beans, brews, onDeleteBrew }) {
   const [open, setOpen] = useState(null);
+  const [confirmId, setConfirmId] = useState(null);
 
   const total = brews.length;
   const avg = total ? (brews.reduce((s, b) => s + b.score, 0) / total).toFixed(1) : '—';
@@ -56,8 +57,14 @@ export function HistoryScreen({ beans, brews }) {
                         ))}
                       </div>
                     )}
-                    <button style={{ marginTop: 14, width: '100%', padding: '11px', borderRadius: 12, background: 'transparent',
-                      border: `1px solid ${C.line}`, color: C.cocoa, fontSize: 13.5, fontWeight: 600 }}>用这组参数再冲一杯 ↻</button>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                      <button style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'transparent',
+                        border: `1px solid ${C.line}`, color: C.cocoa, fontSize: 13.5, fontWeight: 600 }}>用这组参数再冲一杯 ↻</button>
+                      <button onClick={() => setConfirmId(br.id)} aria-label="删除这条记录" style={{ width: 44, flex: '0 0 auto', borderRadius: 12,
+                        background: 'transparent', border: `1px solid ${C.line}`, color: '#b04a35', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <TrashIcon />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -65,6 +72,12 @@ export function HistoryScreen({ beans, brews }) {
           })}
         </div>
       </div>
+
+      {confirmId && (
+        <Confirm title="删除这条冲煮记录？" message="删除后所有人都将看不到这条记录，无法恢复。"
+          onCancel={() => setConfirmId(null)}
+          onConfirm={() => { onDeleteBrew(confirmId); setConfirmId(null); }} />
+      )}
     </>
   );
 }

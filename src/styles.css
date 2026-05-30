@@ -20,5 +20,7 @@
 @keyframes cd-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes cd-pop { 0% { transform: scale(.92); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
 @keyframes cd-rise { from { opacity: .3; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes cd-spin { to { transform: rotate(360deg); } }
 .cd-fade { animation: cd-fade .32s cubic-bezier(.2,.7,.3,1) both; }
 .cd-screen { animation: cd-rise .3s cubic-bezier(.2,.7,.3,1); }
+.cd-spin { animation: cd-spin 1s linear infinite; transform-origin: center; }

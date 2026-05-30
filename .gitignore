@@ -1,6 +1,11 @@
 # dependencies
 node_modules/
 
+# local env (secrets / supabase keys)
+.env
+.env.local
+.env.*.local
+
 # build output
 dist/
 dist-ssr/

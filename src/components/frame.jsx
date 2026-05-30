@@ -133,3 +133,40 @@ export function CupIcon({ on }) { return <svg width="23" height="23" viewBox="0 
 export function Chev() { return <svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M7 1L1.5 7.5 7 14"/></svg>; }
 export function Plus() { return <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round"><path d="M9 2v14M2 9h14"/></svg>; }
 export function Dots3() { return <svg width="4" height="16" viewBox="0 0 4 16" fill="currentColor"><circle cx="2" cy="2" r="2"/><circle cx="2" cy="8" r="2"/><circle cx="2" cy="14" r="2"/></svg>; }
+export function TrashIcon({ size = 16 }) { return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6"/></svg>; }
+
+/* Branded full-screen splash shown while the first sync is in flight. */
+export function Splash({ label = '同步中…' }) {
+  return (
+    <div className="cd-app" style={{
+      position: 'fixed', inset: 0, background: 'radial-gradient(circle at 50% 30%, #efe6d6, #e3d6c0)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18 }}>
+      <svg className="cd-spin" width="46" height="46" viewBox="0 0 46 46" fill="none">
+        <circle cx="23" cy="23" r="19" stroke={C.line} strokeWidth="4" />
+        <path d="M23 4a19 19 0 0 1 19 19" stroke={C.caramel} strokeWidth="4" strokeLinecap="round" />
+      </svg>
+      <div style={{ fontFamily: 'var(--serif)', fontSize: 16, color: C.cocoa }}>{label}</div>
+    </div>
+  );
+}
+
+/* In-app confirm dialog (warm-styled, replaces window.confirm). Renders inside
+   the phone frame via position:absolute. */
+export function Confirm({ title, message, confirmLabel = '删除', onConfirm, onCancel }) {
+  return (
+    <div onClick={onCancel} style={{ position: 'absolute', inset: 0, zIndex: 50, background: 'rgba(42,33,26,0.4)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 28, backdropFilter: 'blur(2px)' }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: C.paper, borderRadius: 20, padding: '22px 22px 18px',
+        width: '100%', maxWidth: 300, boxShadow: '0 20px 50px rgba(0,0,0,0.25)' }}>
+        <div style={{ fontFamily: 'var(--serif)', fontSize: 18, fontWeight: 600, color: C.ink }}>{title}</div>
+        {message && <div style={{ fontSize: 13.5, color: C.cocoa, marginTop: 8, lineHeight: 1.5 }}>{message}</div>}
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: '12px', borderRadius: 13, background: 'transparent',
+            border: `1px solid ${C.line}`, color: C.cocoa, fontSize: 14.5, fontWeight: 600 }}>取消</button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: '12px', borderRadius: 13, background: '#b04a35',
+            color: '#fff', fontSize: 14.5, fontWeight: 600 }}>{confirmLabel}</button>
+        </div>
+      </div>
+    </div>
+  );
+}

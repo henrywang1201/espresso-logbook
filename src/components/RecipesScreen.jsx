@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { C } from '../theme.js';
 import { LAYER_META, layerMl, drinkSummary } from '../data.js';
-import { Bar, RoundBtn, Plus } from './frame.jsx';
+import { Bar, RoundBtn, Plus, TrashIcon, Confirm } from './frame.jsx';
 
 let __glassN = 0;
 
@@ -49,7 +49,7 @@ export function LayeredGlass({ layers, w = 120, h = 158 }) {
   );
 }
 
-export function RecipesScreen({ drinks, addDrink }) {
+export function RecipesScreen({ drinks, addDrink, onDeleteDrink }) {
   const [open, setOpen] = useState(null);     // drink detail
   const [build, setBuild] = useState(false);  // builder sheet
 
@@ -79,18 +79,20 @@ export function RecipesScreen({ drinks, addDrink }) {
         </div>
       </div>
 
-      {open && <DrinkDetail drink={open} onClose={() => setOpen(null)} />}
+      {open && <DrinkDetail drink={open} onClose={() => setOpen(null)}
+        onDelete={() => { onDeleteDrink(open); setOpen(null); }} />}
       {build && <RecipeBuilder onClose={() => setBuild(false)} onSave={(d) => { addDrink(d); setBuild(false); }} />}
     </>
   );
 }
 
 /* Detail bottom sheet — big glass + labeled layer legend + build */
-function DrinkDetail({ drink, onClose }) {
+function DrinkDetail({ drink, onClose, onDelete }) {
   const META = LAYER_META;
   const esp = layerMl(drink, 'espresso');
   const milk = layerMl(drink, 'milk') + layerMl(drink, 'foam');
   const total = drink.layers.reduce((s, l) => s + l.ml, 0);
+  const [confirm, setConfirm] = useState(false);
   return (
     <Sheet onClose={onClose}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
@@ -126,6 +128,17 @@ function DrinkDetail({ drink, onClose }) {
       <div style={{ marginTop: 16, padding: '13px 15px', background: C.paper2, borderRadius: 14, fontSize: 13.5, color: C.cocoa, lineHeight: 1.55 }}>
         <span style={{ fontFamily: 'var(--serif)', fontWeight: 600, color: C.ink }}>做法 · </span>{drink.note}
       </div>
+
+      <button onClick={() => setConfirm(true)} style={{ marginTop: 14, width: '100%', padding: '12px', borderRadius: 13,
+        background: 'transparent', border: `1px solid ${C.line}`, color: '#b04a35', fontSize: 14, fontWeight: 600,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+        <TrashIcon size={16} /> 删除此配方
+      </button>
+
+      {confirm && (
+        <Confirm title={`删除「${drink.name}」配方？`} message="该配方将从所有人的小抄中移除，无法恢复。"
+          onCancel={() => setConfirm(false)} onConfirm={onDelete} />
+      )}
     </Sheet>
   );
 }

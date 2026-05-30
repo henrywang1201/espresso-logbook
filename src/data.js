@@ -1,4 +1,6 @@
-// espresso-logbook — shared data (beans + brew history + drink recipes), localStorage-backed.
+// espresso-logbook — shared data shapes (beans + brews + drinks) and pure helpers.
+// The live data now lives in Supabase (see src/api.js); the *_SEED arrays below
+// double as the read-only fallback when the backend isn't configured yet.
 
 export const BEANS_SEED = [
   { id: 'eth', name: '耶加雪菲 · 科契尔', roaster: '晨光烘焙', roast: '浅烘', origin: '埃塞俄比亚', process: '日晒', dot: '#c98a4a',
@@ -53,17 +55,6 @@ export const DRINKS_SEED = [
   { id: 'americano',  name: '美式',     en: 'AMERICANO',  cup: 240, tag: '清爽', preset: true,
     layers: [{ t: 'water', ml: 150 }, { t: 'espresso', ml: 36 }], note: '浓缩注入热水，保留 crema。' },
 ];
-
-export function load(key, seed) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {}
-  return seed;
-}
-export function save(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
-}
 
 export function beanById(beans, id) { return beans.find((b) => b.id === id) || beans[0]; }
 

@@ -1,9 +1,11 @@
 // Beans library screen — bean cards with roast info, usage stats, set-active.
+import { useState } from 'react';
 import { C } from '../theme.js';
 import { beanStats } from '../data.js';
-import { Bar, RoundBtn, BeanDot, Plus } from './frame.jsx';
+import { Bar, RoundBtn, BeanDot, Plus, TrashIcon, Confirm } from './frame.jsx';
 
-export function BeansScreen({ beans, brews, currentBean, setCurrentBean, setTab }) {
+export function BeansScreen({ beans, brews, currentBean, setCurrentBean, setTab, onDeleteBean }) {
+  const [confirmBean, setConfirmBean] = useState(null);
   return (
     <>
       <Bar title="豆子库" sub={`${beans.length} 款在用`} right={<RoundBtn solid><Plus/></RoundBtn>} />
@@ -29,6 +31,12 @@ export function BeansScreen({ beans, brews, currentBean, setCurrentBean, setTab 
                     </div>
                     <div style={{ fontSize: 12, color: C.cocoa, marginTop: 10, fontStyle: 'italic' }}>{b.notes}</div>
                   </div>
+                  {beans.length > 1 && (
+                    <button onClick={() => setConfirmBean(b)} aria-label="删除这款豆子" style={{ alignSelf: 'flex-start', width: 34, height: 34,
+                      borderRadius: 10, color: C.taupe, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto' }}>
+                      <TrashIcon size={17} />
+                    </button>
+                  )}
                 </div>
                 {/* stats footer */}
                 <div style={{ display: 'flex', alignItems: 'center', borderTop: `1px solid ${C.lineSoft}`, background: C.paper2 }}>
@@ -55,6 +63,13 @@ export function BeansScreen({ beans, brews, currentBean, setCurrentBean, setTab 
           </button>
         </div>
       </div>
+
+      {confirmBean && (
+        <Confirm title={`删除「${confirmBean.name}」？`}
+          message="这款豆子将对所有人移除（已有的冲煮记录会保留，但不再关联到它）。"
+          onCancel={() => setConfirmBean(null)}
+          onConfirm={() => { onDeleteBean(confirmBean); setConfirmBean(null); }} />
+      )}
     </>
   );
 }
