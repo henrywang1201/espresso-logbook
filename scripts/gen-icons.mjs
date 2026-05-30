@@ -8,10 +8,11 @@ import { dirname, join } from 'node:path';
 const pub = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
 const jobs = [
-  { src: 'favicon.svg',       out: 'icon-192.png',         size: 192 },
-  { src: 'favicon.svg',       out: 'icon-512.png',         size: 512 },
-  { src: 'favicon.svg',       out: 'apple-touch-icon.png', size: 180, flatten: '#e3d6c0' },
-  { src: 'icon-maskable.svg', out: 'icon-maskable-512.png', size: 512 },
+  { src: 'favicon.svg',        out: 'icon-192.png',          size: 192 },
+  { src: 'favicon.svg',        out: 'icon-512.png',          size: 512 },
+  // iOS masks corners itself, so use the full-bleed art (no transparent corners).
+  { src: 'icon-maskable.svg',  out: 'apple-touch-icon.png',  size: 180, flatten: '#5a331a' },
+  { src: 'icon-maskable.svg',  out: 'icon-maskable-512.png', size: 512 },
 ];
 
 for (const j of jobs) {

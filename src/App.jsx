@@ -1,6 +1,6 @@
 // espresso-logbook app shell — shared cloud data (Supabase) + realtime sync.
 import { useState, useEffect } from 'react';
-import { DeviceFrame, SBar, BottomNav, Splash } from './components/frame.jsx';
+import { AppShell, BottomNav, Splash } from './components/frame.jsx';
 import { RecordScreen } from './components/RecordScreen.jsx';
 import { RecipesScreen } from './components/RecipesScreen.jsx';
 import { HistoryScreen } from './components/HistoryScreen.jsx';
@@ -96,9 +96,8 @@ export default function App() {
   if (!currentBean) return <Splash label="后端暂无数据，请先运行 schema.sql 种子" />;
 
   return (
-    <DeviceFrame>
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }} className="cd-app">
-        <SBar />
+    <AppShell>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }} className="cd-app">
         {!isConfigured && (
           <div style={{ flex: '0 0 auto', margin: '0 14px 6px', padding: '7px 12px', borderRadius: 10,
             background: C.cremaSoft, color: C.caramelDeep, fontSize: 11.5, fontWeight: 600, textAlign: 'center' }}>
@@ -113,6 +112,6 @@ export default function App() {
         </div>
         <BottomNav tab={tab} setTab={setTab} />
       </div>
-    </DeviceFrame>
+    </AppShell>
   );
 }

@@ -1,52 +1,22 @@
-// espresso-logbook — responsive phone frame + bottom nav + shared bits
-import { useState, useEffect } from 'react';
+// espresso-logbook — responsive app shell + bottom nav + shared bits
 import { C, ratioOf } from '../theme.js';
 
 export { ratioOf };
 
-/* Centered device that scales to fit any viewport (phone / iPad / desktop). */
-export function DeviceFrame({ children }) {
-  const W = 390, H = 844;
-  const [scale, setScale] = useState(1);
-  const [bare, setBare] = useState(false);
-  useEffect(() => {
-    const fit = () => {
-      const pad = window.innerWidth < 480 ? 0 : 48;
-      const s = Math.min((window.innerWidth - pad) / W, (window.innerHeight - pad) / H, 1.08);
-      setScale(s);
-      setBare(s < 1.07 && window.innerWidth < 480);
-    };
-    fit();
-    window.addEventListener('resize', fit);
-    return () => window.removeEventListener('resize', fit);
-  }, []);
+/* Responsive app surface: edge-to-edge on phones, a centered comfortable
+   column on tablet/desktop (no device bezel, no fake status bar). */
+export function AppShell({ children }) {
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: `radial-gradient(circle at 50% 30%, #efe6d6, #e3d6c0)`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+      position: 'fixed', inset: 0, background: 'radial-gradient(circle at 50% 18%, #efe6d6, #e3d6c0)',
+      display: 'flex', justifyContent: 'center',
     }}>
-      <div style={{
-        width: W, height: H, transform: `scale(${scale})`, transformOrigin: 'center center',
-        borderRadius: bare ? 0 : 46, overflow: 'hidden', position: 'relative',
-        background: C.bg, flex: '0 0 auto',
-        boxShadow: bare ? 'none' : '0 40px 90px -20px rgba(42,33,26,0.45), 0 0 0 11px #211a13, 0 0 0 13px #3a2c20',
+      <div className="cd-shell" style={{
+        position: 'relative', width: '100%', maxWidth: 480, height: '100%',
+        display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.bg,
+        paddingTop: 'env(safe-area-inset-top)',
       }}>
         {children}
-      </div>
-    </div>
-  );
-}
-
-/* Status bar (light/dark) */
-export function SBar({ dark }) {
-  const col = dark ? '#fff' : C.ink;
-  return (
-    <div style={{ height: 48, flex: '0 0 48px', display: 'flex', alignItems: 'center',
-      justifyContent: 'space-between', padding: '0 28px 0 30px', fontFamily: 'var(--mono)', fontSize: 14.5, color: col }}>
-      <span style={{ fontWeight: 500 }}>8:42</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-        <svg width="17" height="11" viewBox="0 0 17 11" fill={col}><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
-        <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="0.5" y="0.5" width="18" height="10" rx="3" stroke={col} opacity="0.5"/><rect x="2" y="2" width="13" height="7" rx="1.5" fill={col}/><rect x="19.5" y="3.5" width="1.6" height="4" rx="0.8" fill={col} opacity="0.5"/></svg>
       </div>
     </div>
   );
@@ -61,7 +31,7 @@ const NAV = [
 ];
 export function BottomNav({ tab, setTab }) {
   return (
-    <div style={{ flex: '0 0 auto', display: 'flex', padding: '8px 18px 30px', background: C.paper,
+    <div style={{ flex: '0 0 auto', display: 'flex', padding: '8px 18px max(env(safe-area-inset-bottom), 16px)', background: C.paper,
       borderTop: `1px solid ${C.line}`, gap: 6 }}>
       {NAV.map((n) => {
         const on = n.id === tab;
@@ -82,7 +52,7 @@ export function BottomNav({ tab, setTab }) {
 /* App bar */
 export function Bar({ title, sub, left, right }) {
   return (
-    <div style={{ flex: '0 0 auto', padding: '2px 20px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ flex: '0 0 auto', padding: '12px 20px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
       <div style={{ width: 40 }}>{left}</div>
       <div style={{ flex: 1, textAlign: 'center' }}>
         <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 600, color: C.ink, lineHeight: 1.05 }}>{title}</div>

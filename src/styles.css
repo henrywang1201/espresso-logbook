@@ -24,3 +24,8 @@
 .cd-fade { animation: cd-fade .32s cubic-bezier(.2,.7,.3,1) both; }
 .cd-screen { animation: cd-rise .3s cubic-bezier(.2,.7,.3,1); }
 .cd-spin { animation: cd-spin 1s linear infinite; transform-origin: center; }
+
+/* On wider screens the app sits as a centered panel (not a phone mock). */
+@media (min-width: 520px) {
+  .cd-shell { box-shadow: 0 0 0 1px var(--line), 0 30px 90px -34px rgba(42, 33, 26, 0.42); }
+}
