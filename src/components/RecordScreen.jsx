@@ -15,7 +15,9 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   const [active, setActive] = useState('dose');
   const [time, setTime] = useState(28);          // the time parameter (seconds)
   const [pickBean, setPickBean] = useState(false);
+  const [score, setScore] = useState(7);
   const [saved, setSaved] = useState(false);
+  const scoreColor = score >= 8 ? C.good : score >= 6 ? C.caramel : C.warn;
 
   // when bean changes, adopt its defaults
   useEffect(() => { setVals((s) => ({ ...s, dose: currentBean.defDose, grind: currentBean.defGrind })); }, [currentBean.id]);
@@ -51,7 +53,7 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   const D = 210, cx = D / 2, cy = D / 2, R = D / 2 - 5, ticks = 52;
 
   const doSave = () => {
-    onSave({ beanId: currentBean.id, dose: vals.dose, yield: vals.yield, time: Math.round(displayTime), grind: vals.grind, temp: vals.temp });
+    onSave({ beanId: currentBean.id, dose: vals.dose, yield: vals.yield, time: Math.round(displayTime), grind: vals.grind, temp: vals.temp, score });
     setSaved(true); setTimeout(() => setSaved(false), 1500);
   };
 
@@ -138,6 +140,26 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
               ? <span style={{ width: 17, height: 17, borderRadius: 4, background: C.ink }} />
               : <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5l12 7-12 7z"/></svg>}
           </button>
+        </div>
+
+        {/* FLAVOR SCORE — tap to rate 1–10 */}
+        <div style={{ marginTop: 12, padding: '14px 16px', background: C.paper, border: `1px solid ${C.line}`, borderRadius: 18 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <div style={{ fontSize: 11, letterSpacing: '0.1em', fontFamily: 'var(--mono)', color: C.taupe }}>风味评分 · SCORE</div>
+            <div className="cd-num" style={{ fontSize: 18, fontWeight: 600, color: scoreColor }}>
+              {score}.0<span style={{ fontSize: 11, color: C.taupe, fontWeight: 400 }}> /10</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 5, marginTop: 11 }}>
+            {Array.from({ length: 10 }).map((_, i) => {
+              const val = i + 1, on = val <= score;
+              return (
+                <button key={val} onClick={() => setScore(val)} aria-label={`评分 ${val}`} style={{
+                  flex: 1, height: 28, borderRadius: 7, background: on ? scoreColor : C.paper2,
+                  border: `1px solid ${on ? scoreColor : C.line}`, transition: 'background .12s, border-color .12s' }} />
+              );
+            })}
+          </div>
         </div>
       </div>
 

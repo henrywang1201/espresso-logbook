@@ -42,6 +42,9 @@ export async function createBean(bean) {
   const row = { id: 'bean' + Date.now(), ...bean };
   return unwrap(await supabase.from('beans').insert(row).select().single());
 }
+export async function updateBean(id, patch) {
+  return unwrap(await supabase.from('beans').update(patch).eq('id', id).select().single());
+}
 export async function deleteBean(id) {
   const { error } = await supabase.from('beans').delete().eq('id', id);
   if (error) throw error;

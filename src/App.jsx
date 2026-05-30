@@ -10,7 +10,8 @@ import { BEANS_SEED, BREWS_SEED, DRINKS_SEED } from './data.js';
 import { isConfigured, supabase } from './supabase.js';
 import {
   fetchBeans, fetchBrews, fetchDrinks,
-  createBrew, deleteBrew, createDrink, deleteDrink, deleteBean,
+  createBrew, deleteBrew, createDrink, deleteDrink,
+  createBean, updateBean, deleteBean,
 } from './api.js';
 
 function pickDefaultBean(beans) { return beans.find((b) => b.id === 'house') || beans[0] || null; }
@@ -90,6 +91,16 @@ export default function App() {
     setBeans((prev) => prev.filter((x) => x.id !== b.id));
     try { await deleteBean(b.id); } catch (e) { setError(e?.message || String(e)); }
   };
+  const addBean = async (bean) => {
+    if (!isConfigured) return;
+    try { const row = await createBean(bean); setBeans((prev) => [...prev, row]); }
+    catch (e) { setError(e?.message || String(e)); }
+  };
+  const editBean = async (id, patch) => {
+    if (!isConfigured) return;
+    setBeans((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
+    try { await updateBean(id, patch); } catch (e) { setError(e?.message || String(e)); }
+  };
 
   if (loading) return <Splash label="同步中…" />;
   if (error) return <Splash label={'连接后端失败：' + error} />;
@@ -108,7 +119,7 @@ export default function App() {
           {tab === 'record' && <RecordScreen beans={beans} currentBean={currentBean} setCurrentBean={setCurrentBean} onSave={addBrew} />}
           {tab === 'recipes' && <RecipesScreen drinks={drinks} addDrink={addDrink} onDeleteDrink={onDeleteDrink} />}
           {tab === 'history' && <HistoryScreen beans={beans} brews={brews} onDeleteBrew={onDeleteBrew} />}
-          {tab === 'beans' && <BeansScreen beans={beans} brews={brews} currentBean={currentBean} setCurrentBean={setCurrentBean} setTab={setTab} onDeleteBean={onDeleteBean} />}
+          {tab === 'beans' && <BeansScreen beans={beans} brews={brews} currentBean={currentBean} setCurrentBean={setCurrentBean} setTab={setTab} onDeleteBean={onDeleteBean} onAddBean={addBean} onEditBean={editBean} />}
         </div>
         <BottomNav tab={tab} setTab={setTab} />
       </div>

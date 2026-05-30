@@ -104,6 +104,21 @@ export function Chev() { return <svg width="9" height="15" viewBox="0 0 9 15" fi
 export function Plus() { return <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round"><path d="M9 2v14M2 9h14"/></svg>; }
 export function Dots3() { return <svg width="4" height="16" viewBox="0 0 4 16" fill="currentColor"><circle cx="2" cy="2" r="2"/><circle cx="2" cy="8" r="2"/><circle cx="2" cy="14" r="2"/></svg>; }
 export function TrashIcon({ size = 16 }) { return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6"/></svg>; }
+export function EditIcon({ size = 16 }) { return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 5.5l4 4M4.5 19.5l1.2-4L16 5.2a2.05 2.05 0 0 1 2.9 2.9L8.5 18.3z"/></svg>; }
+
+/* Shared bottom sheet (overlay slides up within the app column). */
+export function Sheet({ children, onClose }) {
+  return (
+    <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 30, background: 'rgba(42,33,26,0.42)',
+      display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backdropFilter: 'blur(2px)' }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: C.bg, borderRadius: '24px 24px 0 0',
+        padding: '10px 20px 30px', maxHeight: '90%', overflowY: 'auto' }}>
+        <div style={{ width: 40, height: 4, borderRadius: 2, background: C.line, margin: '4px auto 16px' }} />
+        {children}
+      </div>
+    </div>
+  );
+}
 
 /* Branded full-screen splash shown while the first sync is in flight. */
 export function Splash({ label = '同步中…' }) {
