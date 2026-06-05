@@ -7,8 +7,12 @@
     <meta name="description" content="意式浓缩冲煮记录 — 拨盘录参、萃取计时、配方小抄、历史与豆子库。" />
 
     <!-- PWA / theming -->
-    <meta name="theme-color" content="#a96a39" />
+    <!-- theme-color matches the app's top surface so the iOS/Android status bar
+         (and the area behind the notch / Dynamic Island) blends flush. -->
+    <meta name="theme-color" content="#f1e8da" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- "default" keeps dark status-bar glyphs (readable on the light cream app). -->
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="espresso" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -23,7 +27,10 @@
     />
 
     <style>
-      html, body { margin: 0; padding: 0; height: 100%; background: #e3d6c0; overflow: hidden; }
+      /* Cream base so the safe-area / status-bar region never shows a mismatched
+         strip on notch / Dynamic Island phones in standalone mode. */
+      html, body { margin: 0; padding: 0; height: 100%; background: #f1e8da; overflow: hidden; }
+      body { background: #f1e8da; }
       #root { height: 100%; }
     </style>
   </head>
