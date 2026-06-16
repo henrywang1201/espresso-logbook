@@ -12,7 +12,7 @@ export function AppShell({ children }) {
       display: 'flex', justifyContent: 'center',
     }}>
       <div className="cd-shell" style={{
-        position: 'relative', width: '100%', maxWidth: 480, height: '100%',
+        position: 'relative', width: '100%', maxWidth: 480, height: '100%', boxSizing: 'border-box',
         display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.bg,
         paddingTop: 'env(safe-area-inset-top)',
       }}>

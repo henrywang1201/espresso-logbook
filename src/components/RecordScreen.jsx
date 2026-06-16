@@ -3,6 +3,9 @@ import { useState, useRef, useEffect } from 'react';
 import { C, ratioOf } from '../theme.js';
 import { Bar, RoundBtn, BeanDot, Dots3 } from './frame.jsx';
 
+// quick flavor / defect notes — tap to attach, or type your own
+const FLAVOR_TAGS = ['太苦', '太酸', '太涩', '太咸', '太稀', '太浓', '焦苦', '寡淡', '平衡', '醇厚', '甜感', '回甘', '花香', '果酸'];
+
 const PARAMS = {
   dose:  { label: '粉量', en: 'DOSE',  unit: 'g',  min: 14, max: 22, step: 0.1, fixed: 1 },
   yield: { label: '液重', en: 'YIELD', unit: 'g',  min: 20, max: 60, step: 0.5, fixed: 1 },
@@ -19,7 +22,16 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);   // tap dial center → keypad entry
   const [draft, setDraft] = useState('');
+  const [tags, setTags] = useState([]);             // flavor notes for this shot
+  const [tagDraft, setTagDraft] = useState('');
   const scoreColor = score >= 8 ? C.good : score >= 6 ? C.caramel : C.warn;
+
+  const toggleTag = (t) => setTags((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
+  const addCustomTag = () => {
+    const t = tagDraft.trim();
+    if (t && !tags.includes(t)) setTags((s) => [...s, t]);
+    setTagDraft('');
+  };
 
   // when bean changes, adopt its defaults
   useEffect(() => { setVals((s) => ({ ...s, dose: currentBean.defDose, grind: currentBean.defGrind })); }, [currentBean.id]);
@@ -68,7 +80,8 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   };
 
   const doSave = () => {
-    onSave({ beanId: currentBean.id, dose: vals.dose, yield: vals.yield, time: Math.round(displayTime), grind: vals.grind, temp: vals.temp, score });
+    onSave({ beanId: currentBean.id, dose: vals.dose, yield: vals.yield, time: Math.round(displayTime), grind: vals.grind, temp: vals.temp, score, tags });
+    setTags([]); setTagDraft('');
     setSaved(true); setTimeout(() => setSaved(false), 1500);
   };
 
@@ -194,6 +207,42 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
                   border: `1px solid ${on ? scoreColor : C.line}`, transition: 'background .12s, border-color .12s' }} />
               );
             })}
+          </div>
+        </div>
+
+        {/* FLAVOR TAGS — tap presets or add your own */}
+        <div style={{ marginTop: 12, padding: '14px 16px', background: C.paper, border: `1px solid ${C.line}`, borderRadius: 18 }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.1em', fontFamily: 'var(--mono)', color: C.taupe }}>风味标签 · NOTES</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 11 }}>
+            {FLAVOR_TAGS.map((t) => {
+              const on = tags.includes(t);
+              return (
+                <button key={t} onClick={() => toggleTag(t)} style={{ padding: '7px 13px', borderRadius: 999, fontSize: 13, fontWeight: 600,
+                  background: on ? C.caramel : C.paper2, color: on ? '#fff' : C.cocoa,
+                  border: `1px solid ${on ? C.caramel : C.line}`, transition: 'all .14s' }}>{t}</button>
+              );
+            })}
+            {tags.filter((t) => !FLAVOR_TAGS.includes(t)).map((t) => (
+              <button key={t} onClick={() => toggleTag(t)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5,
+                padding: '7px 11px 7px 13px', borderRadius: 999, fontSize: 13, fontWeight: 600,
+                background: C.caramel, color: '#fff', border: `1px solid ${C.caramel}` }}>
+                {t}<span style={{ fontSize: 15, lineHeight: 1, opacity: 0.85 }}>×</span>
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 11 }}>
+            <input
+              type="text"
+              value={tagDraft}
+              onChange={(e) => setTagDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomTag(); } }}
+              placeholder="自定义风味…"
+              style={{ flex: 1, minWidth: 0, padding: '10px 13px', borderRadius: 12, fontSize: 13.5,
+                background: C.paper2, border: `1px solid ${C.line}`, color: C.ink, outline: 'none' }}
+            />
+            <button onClick={addCustomTag} disabled={!tagDraft.trim()} style={{ flex: '0 0 auto', padding: '0 16px', borderRadius: 12,
+              fontSize: 14, fontWeight: 600, background: tagDraft.trim() ? C.ink : C.paper2,
+              color: tagDraft.trim() ? '#fff' : C.taupe, border: `1px solid ${tagDraft.trim() ? C.ink : C.line}` }}>添加</button>
           </div>
         </div>
       </div>
