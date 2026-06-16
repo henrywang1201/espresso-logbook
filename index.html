@@ -12,8 +12,12 @@
     <meta name="theme-color" content="#f1e8da" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <!-- "default" keeps dark status-bar glyphs (readable on the light cream app). -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- "black-translucent" lets the web view extend BEHIND the status bar /
+         Dynamic Island so our cream background paints flush to the very top
+         (the user wants one consistent background color). Trade-off: iOS forces
+         the status-bar glyphs to white. We pad content down with
+         env(safe-area-inset-top) in the app shell so nothing hides under the notch. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="espresso" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

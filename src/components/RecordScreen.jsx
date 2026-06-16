@@ -17,6 +17,8 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   const [pickBean, setPickBean] = useState(false);
   const [score, setScore] = useState(7);
   const [saved, setSaved] = useState(false);
+  const [editing, setEditing] = useState(false);   // tap dial center → keypad entry
+  const [draft, setDraft] = useState('');
   const scoreColor = score >= 8 ? C.good : score >= 6 ? C.caramel : C.warn;
 
   // when bean changes, adopt its defaults
@@ -51,6 +53,19 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   const onUp = (e) => { lastAng.current = null; try { dialRef.current.releasePointerCapture(e.pointerId); } catch {} };
 
   const D = 210, cx = D / 2, cy = D / 2, R = D / 2 - 5, ticks = 52;
+
+  /* tap the dial center to type an exact value on the numeric keypad */
+  useEffect(() => { setEditing(false); }, [active]);
+  const openEdit = () => { setDraft(v.toFixed(p.fixed)); setEditing(true); };
+  const commitEdit = () => {
+    setEditing(false);
+    const n = parseFloat(draft);
+    if (!Number.isNaN(n)) {
+      let nv = Math.max(p.min, Math.min(p.max, n));
+      nv = Math.round(nv / p.step) * p.step;
+      setVals((s) => ({ ...s, [active]: +nv.toFixed(2) }));
+    }
+  };
 
   const doSave = () => {
     onSave({ beanId: currentBean.id, dose: vals.dose, yield: vals.yield, time: Math.round(displayTime), grind: vals.grind, temp: vals.temp, score });
@@ -90,13 +105,33 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
               border: `1px solid ${C.line}`, boxShadow: 'inset 0 2px 6px rgba(255,255,255,0.7), 0 10px 22px rgba(42,33,26,0.12)',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ fontSize: 10.5, letterSpacing: '0.14em', color: C.taupe, fontFamily: 'var(--mono)' }}>{p.en}</div>
-              <div className="cd-num" style={{ fontSize: 48, fontWeight: 500, color: C.ink, lineHeight: 1, marginTop: 2 }}>{v.toFixed(p.fixed)}</div>
+              {editing ? (
+                <input
+                  autoFocus
+                  type="text"
+                  inputMode="decimal"
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value.replace(/[^0-9.]/g, ''))}
+                  onBlur={commitEdit}
+                  onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="cd-num"
+                  style={{ width: 116, marginTop: 2, textAlign: 'center', fontSize: 44, fontWeight: 500, lineHeight: 1,
+                    color: C.caramel, background: 'transparent', border: 'none', outline: 'none', padding: 0,
+                    borderBottom: `2px solid ${C.caramel}` }}
+                />
+              ) : (
+                <button onPointerDown={(e) => e.stopPropagation()} onClick={openEdit} aria-label="点按输入数值"
+                  style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'text' }}>
+                  <span className="cd-num" style={{ display: 'block', fontSize: 48, fontWeight: 500, color: C.ink, lineHeight: 1, marginTop: 2 }}>{v.toFixed(p.fixed)}</span>
+                </button>
+              )}
               <div style={{ fontSize: 12.5, color: C.cocoa, marginTop: 3, fontFamily: 'var(--serif)' }}>{p.label} <span style={{ color: C.taupe }}>{p.unit}</span></div>
             </div>
             <div style={{ position: 'absolute', left: cx + Math.cos(angle * Math.PI / 180) * (R - 4) - 7, top: cy + Math.sin(angle * Math.PI / 180) * (R - 4) - 7,
               width: 14, height: 14, borderRadius: 7, background: C.caramel, boxShadow: '0 2px 6px rgba(169,106,57,0.5)', border: '2px solid #fff' }} />
           </div>
-          <div style={{ fontSize: 11, color: C.taupe, marginTop: 0, fontFamily: 'var(--mono)', whiteSpace: 'nowrap' }}>↻ 旋转拨盘微调 · 比 {ratioOf(vals.dose, vals.yield)}</div>
+          <div style={{ fontSize: 11, color: C.taupe, marginTop: 0, fontFamily: 'var(--mono)', whiteSpace: 'nowrap' }}>↻ 旋转微调 · 点中心键入 · 比 {ratioOf(vals.dose, vals.yield)}</div>
         </div>
 
         {/* param chips */}
