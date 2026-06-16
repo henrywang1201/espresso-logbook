@@ -18,6 +18,15 @@ export function AppShell({ children }) {
       }}>
         {children}
       </div>
+      {/* Paint the home-indicator safe area with the bottom-nav color so the nav
+          visually reaches the physical bottom (no backdrop strip showing through,
+          regardless of how iOS resolves the standalone viewport height). Pinned
+          to the always-full-screen fixed outer; collapses to 0 where there's no
+          inset (desktop / no home bar). Width-matched + centered like the nav. */}
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, display: 'flex',
+        justifyContent: 'center', pointerEvents: 'none' }}>
+        <div style={{ width: '100%', maxWidth: 480, height: 'env(safe-area-inset-bottom)', background: C.paper }} />
+      </div>
     </div>
   );
 }
