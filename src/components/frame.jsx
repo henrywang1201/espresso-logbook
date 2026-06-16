@@ -9,23 +9,19 @@ export function AppShell({ children }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, background: 'radial-gradient(circle at 50% 18%, #efe6d6, #e3d6c0)',
-      display: 'flex', justifyContent: 'center',
     }}>
+      {/* Pin the shell to BOTH the top and bottom edges (top:0 / bottom:0) of the
+          always-full-screen fixed outer instead of using height:100% — percentage
+          height mis-resolves against a fixed ancestor in iOS standalone mode and
+          leaves a backdrop strip below the nav. Centered + width-capped via
+          translateX so the bottom nav reaches the true physical bottom. */}
       <div className="cd-shell" style={{
-        position: 'relative', width: '100%', maxWidth: 480, height: '100%', boxSizing: 'border-box',
+        position: 'absolute', top: 0, bottom: 0, left: '50%', transform: 'translateX(-50%)',
+        width: '100%', maxWidth: 480, boxSizing: 'border-box',
         display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.bg,
         paddingTop: 'env(safe-area-inset-top)',
       }}>
         {children}
-      </div>
-      {/* Paint the home-indicator safe area with the bottom-nav color so the nav
-          visually reaches the physical bottom (no backdrop strip showing through,
-          regardless of how iOS resolves the standalone viewport height). Pinned
-          to the always-full-screen fixed outer; collapses to 0 where there's no
-          inset (desktop / no home bar). Width-matched + centered like the nav. */}
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, display: 'flex',
-        justifyContent: 'center', pointerEvents: 'none' }}>
-        <div style={{ width: '100%', maxWidth: 480, height: 'env(safe-area-inset-bottom)', background: C.paper }} />
       </div>
     </div>
   );
