@@ -113,14 +113,14 @@ export default function App() {
 
   return (
     <AppShell>
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }} className="cd-app">
+      <div className="cd-app">
         {!isConfigured && (
           <div style={{ flex: '0 0 auto', margin: '0 14px 6px', padding: '7px 12px', borderRadius: 10,
             background: C.cremaSoft, color: C.caramelDeep, fontSize: 11.5, fontWeight: 600, textAlign: 'center' }}>
             后端未配置 · 当前为本地只读演示数据
           </div>
         )}
-        <div key={tab} className="cd-screen" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div key={tab} className="cd-screen">
           {tab === 'record' && <RecordScreen beans={beans} currentBean={currentBean} setCurrentBean={setCurrentBean} onSave={addBrew} />}
           {tab === 'recipes' && <RecipesScreen drinks={drinks} addDrink={addDrink} onDeleteDrink={onDeleteDrink} />}
           {tab === 'history' && <HistoryScreen beans={beans} brews={brews} onDeleteBrew={onDeleteBrew} onEditBrew={editBrew} />}

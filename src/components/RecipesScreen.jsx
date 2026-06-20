@@ -56,7 +56,7 @@ export function RecipesScreen({ drinks, addDrink, onDeleteDrink }) {
   return (
     <>
       <Bar title="配方小抄" sub="ESPRESSO DRINKS" right={<RoundBtn solid onClick={() => setBuild(true)}><Plus/></RoundBtn>} />
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 16px 20px' }}>
+      <div className="cd-scroll cd-scroll--compact">
         <div style={{ fontSize: 12, color: C.taupe, marginBottom: 12, lineHeight: 1.5 }}>
           以一份浓缩（18g→36g）为基准的常见意式饮品配方 · 点开看分层与做法
         </div>
@@ -199,7 +199,7 @@ function Sheet({ children, onClose }) {
     <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 30, background: 'rgba(42,33,26,0.42)',
       display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backdropFilter: 'blur(2px)' }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: C.bg, borderRadius: '24px 24px 0 0',
-        padding: '10px 20px 30px', maxHeight: '88%', overflowY: 'auto' }}>
+        padding: '10px 20px calc(30px + env(safe-area-inset-bottom, 0px))', maxHeight: '88%', overflowY: 'auto' }}>
         <div style={{ width: 40, height: 4, borderRadius: 2, background: C.line, margin: '4px auto 16px' }} />
         {children}
       </div>
