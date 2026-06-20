@@ -7,12 +7,9 @@ export { ratioOf };
    column on tablet/desktop (no device bezel, no fake status bar). */
 export function AppShell({ children }) {
   return (
-    <div className="cd-viewport" style={{ position: 'fixed', inset: 0 }}>
-      {/* Pin the shell to BOTH the top and bottom edges (top:0 / bottom:0) of the
-          always-full-screen fixed outer instead of using height:100% — percentage
-          height mis-resolves against a fixed ancestor in iOS standalone mode and
-          leaves a backdrop strip below the nav. Centered + width-capped via
-          translateX so the bottom nav reaches the true physical bottom. */}
+    <div className="cd-viewport">
+      {/* Pin the shell to the full viewport surface, then center + width-cap it
+          so the app stays edge-to-edge on phones and comfortable on larger screens. */}
       <div className="cd-shell" style={{
         position: 'absolute', top: 0, bottom: 0, left: '50%', transform: 'translateX(-50%)',
         width: '100%', maxWidth: 480, boxSizing: 'border-box',
@@ -34,20 +31,21 @@ const NAV = [
 ];
 export function BottomNav({ tab, setTab }) {
   return (
-    <div style={{ flex: '0 0 auto', display: 'flex', padding: '8px 18px 16px', paddingBottom: 'max(env(safe-area-inset-bottom), 16px)', background: C.paper,
-      borderTop: `1px solid ${C.line}`, gap: 6 }}>
-      {NAV.map((n) => {
-        const on = n.id === tab;
-        return (
-          <button key={n.id} onClick={() => setTab(n.id)} style={{
-            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '8px 0',
-            color: on ? C.caramel : C.taupe, transition: 'color .16s',
-          }}>
-            {n.icon(on)}
-            <span style={{ fontSize: 11, fontWeight: on ? 700 : 500 }}>{n.label}</span>
-          </button>
-        );
-      })}
+    <div className="cd-bottom-nav">
+      <div className="cd-bottom-nav-row">
+        {NAV.map((n) => {
+          const on = n.id === tab;
+          return (
+            <button key={n.id} onClick={() => setTab(n.id)} style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '8px 0',
+              color: on ? C.caramel : C.taupe, transition: 'color .16s',
+            }}>
+              {n.icon(on)}
+              <span style={{ fontSize: 11, fontWeight: on ? 700 : 500 }}>{n.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
