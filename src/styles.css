@@ -39,11 +39,9 @@
 }
 
 .cd-bottom-nav {
-  --bottom-safe: 0px;
   flex: 0 0 auto;
   background: var(--paper);
   border-top: 1px solid var(--line);
-  padding-bottom: var(--bottom-safe);
   overflow: hidden;
 }
 .cd-bottom-nav-row {
@@ -56,18 +54,6 @@
   .cd-viewport {
     height: 100dvh;
     min-height: 0;
-  }
-}
-
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .cd-bottom-nav {
-    --bottom-safe: env(safe-area-inset-bottom);
-  }
-}
-
-@supports (padding-bottom: clamp(0px, 1px, 2px)) {
-  .cd-bottom-nav {
-    --bottom-safe: clamp(0px, env(safe-area-inset-bottom, 0px), 34px);
   }
 }
 
