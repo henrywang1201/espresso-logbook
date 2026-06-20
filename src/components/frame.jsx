@@ -7,9 +7,7 @@ export { ratioOf };
    column on tablet/desktop (no device bezel, no fake status bar). */
 export function AppShell({ children }) {
   return (
-    <div style={{
-      position: 'fixed', inset: 0, background: 'radial-gradient(circle at 50% 18%, #efe6d6, #e3d6c0)',
-    }}>
+    <div className="cd-viewport" style={{ position: 'fixed', inset: 0 }}>
       {/* Pin the shell to BOTH the top and bottom edges (top:0 / bottom:0) of the
           always-full-screen fixed outer instead of using height:100% — percentage
           height mis-resolves against a fixed ancestor in iOS standalone mode and
@@ -36,7 +34,7 @@ const NAV = [
 ];
 export function BottomNav({ tab, setTab }) {
   return (
-    <div style={{ flex: '0 0 auto', display: 'flex', padding: '8px 18px max(env(safe-area-inset-bottom), 16px)', background: C.paper,
+    <div style={{ flex: '0 0 auto', display: 'flex', padding: '8px 18px 16px', paddingBottom: 'max(env(safe-area-inset-bottom), 16px)', background: C.paper,
       borderTop: `1px solid ${C.line}`, gap: 6 }}>
       {NAV.map((n) => {
         const on = n.id === tab;

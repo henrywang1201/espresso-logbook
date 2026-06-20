@@ -1,10 +1,18 @@
 // History screen — list of brews + tap-to-expand detail.
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { C, ratioOf } from '../theme.js';
 import { beanById } from '../data.js';
 import { Bar, BeanDot, ScoreChip, TrashIcon, Confirm } from './frame.jsx';
 
-export function HistoryScreen({ beans, brews, onDeleteBrew }) {
+const BREW_PARAMS = [
+  { key: 'dose', label: '粉量', unit: 'g', min: 0, max: 40, step: 0.1, fixed: 1 },
+  { key: 'yield', label: '液重', unit: 'g', min: 0, max: 120, step: 0.1, fixed: 1 },
+  { key: 'time', label: '时间', unit: 's', min: 0, max: 300, step: 1, fixed: 0 },
+  { key: 'grind', label: '研磨', unit: '', min: 0, max: 12, step: 0.1, fixed: 1 },
+  { key: 'temp', label: '水温', unit: '°C', min: 0, max: 100, step: 0.5, fixed: 1 },
+];
+
+export function HistoryScreen({ beans, brews, onDeleteBrew, onEditBrew }) {
   const [open, setOpen] = useState(null);
   const [confirmId, setConfirmId] = useState(null);
 
@@ -42,12 +50,12 @@ export function HistoryScreen({ beans, brews, onDeleteBrew }) {
                 {isOpen && (
                   <div className="cd-fade" style={{ borderTop: `1px solid ${C.lineSoft}`, padding: '14px 15px', background: C.paper2 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
-                      {[['粉量', br.dose.toFixed(1), 'g'], ['液重', br.yield.toFixed(1), 'g'], ['粉液比', ratioOf(br.dose, br.yield), ''],
-                        ['时间', br.time, 's'], ['研磨', br.grind.toFixed(1), ''], ['水温', br.temp, '°C']].map(([l, val, u]) => (
-                        <div key={l}>
-                          <div style={{ fontSize: 10.5, color: C.taupe }}>{l}</div>
-                          <div className="cd-num" style={{ fontSize: 17, fontWeight: 500, color: C.ink, marginTop: 1 }}>{val}<span style={{ fontSize: 10, color: C.taupe }}>{u}</span></div>
-                        </div>
+                      <div>
+                        <div style={{ fontSize: 10.5, color: C.taupe }}>粉液比</div>
+                        <div className="cd-num" style={{ fontSize: 17, fontWeight: 500, color: C.ink, marginTop: 8 }}>{ratioOf(br.dose, br.yield)}</div>
+                      </div>
+                      {BREW_PARAMS.map((param) => (
+                        <EditableBrewParam key={param.key} brew={br} param={param} onEditBrew={onEditBrew} />
                       ))}
                     </div>
                     {br.tags && br.tags.length > 0 && (
@@ -80,6 +88,72 @@ export function HistoryScreen({ beans, brews, onDeleteBrew }) {
       )}
     </>
   );
+}
+
+function EditableBrewParam({ brew, param, onEditBrew }) {
+  const value = brew[param.key];
+  const [draft, setDraft] = useState(formatParam(value, param));
+  const [saving, setSaving] = useState(false);
+  const cancelEdit = useRef(false);
+
+  useEffect(() => { setDraft(formatParam(value, param)); }, [value, param]);
+
+  const commit = async () => {
+    if (cancelEdit.current) {
+      cancelEdit.current = false;
+      setDraft(formatParam(value, param));
+      return;
+    }
+    const n = parseFloat(draft);
+    if (Number.isNaN(n)) {
+      setDraft(formatParam(value, param));
+      return;
+    }
+    let next = Math.max(param.min, Math.min(param.max, n));
+    next = Math.round(next / param.step) * param.step;
+    next = param.fixed === 0 ? Math.round(next) : +next.toFixed(param.fixed);
+    setDraft(formatParam(next, param));
+    if (next === Number(value)) return;
+    setSaving(true);
+    try {
+      await onEditBrew?.(brew.id, { [param.key]: next });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <label style={{ display: 'block', minWidth: 0 }}>
+      <div style={{ fontSize: 10.5, color: C.taupe }}>{param.label}</div>
+      <div style={{ position: 'relative', marginTop: 4 }}>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value.replace(/[^0-9.]/g, ''))}
+          onBlur={commit}
+          onFocus={(e) => e.currentTarget.select()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') e.currentTarget.blur();
+            if (e.key === 'Escape') { cancelEdit.current = true; e.currentTarget.blur(); }
+          }}
+          className="cd-num"
+          style={{ width: '100%', minWidth: 0, padding: param.unit ? '7px 21px 7px 8px' : '7px 8px',
+            borderRadius: 10, border: `1px solid ${saving ? C.caramel : C.line}`,
+            background: saving ? C.cremaSoft : C.paper, color: C.ink, outline: 'none',
+            fontSize: 16, fontWeight: 500, transition: 'border-color .15s, background .15s' }}
+        />
+        {param.unit && <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+          fontSize: 10, color: C.taupe, pointerEvents: 'none' }}>{param.unit}</span>}
+      </div>
+    </label>
+  );
+}
+
+function formatParam(value, param) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '';
+  return param.fixed === 0 ? String(Math.round(n)) : n.toFixed(param.fixed);
 }
 
 function mostUsed(beans, brews) {

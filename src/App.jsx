@@ -10,7 +10,7 @@ import { BEANS_SEED, BREWS_SEED, DRINKS_SEED } from './data.js';
 import { isConfigured, supabase } from './supabase.js';
 import {
   fetchBeans, fetchBrews, fetchDrinks,
-  createBrew, deleteBrew, createDrink, deleteDrink,
+  createBrew, deleteBrew, updateBrew, createDrink, deleteDrink,
   createBean, updateBean, deleteBean,
 } from './api.js';
 
@@ -76,6 +76,11 @@ export default function App() {
     setBrews((prev) => prev.filter((b) => b.id !== id));
     try { await deleteBrew(id); } catch (e) { setError(e?.message || String(e)); }
   };
+  const editBrew = async (id, patch) => {
+    setBrews((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
+    if (!isConfigured) return;
+    try { await updateBrew(id, patch); } catch (e) { setError(e?.message || String(e)); }
+  };
   const addDrink = async (d) => {
     if (!isConfigured) return;
     try { const row = await createDrink(d); setDrinks((prev) => [...prev, row]); }
@@ -118,7 +123,7 @@ export default function App() {
         <div key={tab} className="cd-screen" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
           {tab === 'record' && <RecordScreen beans={beans} currentBean={currentBean} setCurrentBean={setCurrentBean} onSave={addBrew} />}
           {tab === 'recipes' && <RecipesScreen drinks={drinks} addDrink={addDrink} onDeleteDrink={onDeleteDrink} />}
-          {tab === 'history' && <HistoryScreen beans={beans} brews={brews} onDeleteBrew={onDeleteBrew} />}
+          {tab === 'history' && <HistoryScreen beans={beans} brews={brews} onDeleteBrew={onDeleteBrew} onEditBrew={editBrew} />}
           {tab === 'beans' && <BeansScreen beans={beans} brews={brews} currentBean={currentBean} setCurrentBean={setCurrentBean} setTab={setTab} onDeleteBean={onDeleteBean} onAddBean={addBean} onEditBean={editBean} />}
         </div>
         <BottomNav tab={tab} setTab={setTab} />

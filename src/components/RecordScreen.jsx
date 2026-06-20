@@ -39,13 +39,39 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   /* ── timer ── */
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);     // float seconds while running
+  const [timeEditing, setTimeEditing] = useState(false);
+  const [timeDraft, setTimeDraft] = useState('');
   const raf = useRef(null); const t0 = useRef(0); const base = useRef(0);
+  const cancelTimeEdit = useRef(false);
   const tick = () => { setElapsed(base.current + (performance.now() - t0.current) / 1000); raf.current = requestAnimationFrame(tick); };
   const startTimer = () => { t0.current = performance.now(); setRunning(true); raf.current = requestAnimationFrame(tick); };
   const stopTimer = () => { cancelAnimationFrame(raf.current); setRunning(false); base.current = elapsed; setTime(Math.round(elapsed)); };
-  const resetTimer = () => { cancelAnimationFrame(raf.current); setRunning(false); base.current = 0; setElapsed(0); };
+  const resetTimer = () => { cancelAnimationFrame(raf.current); setRunning(false); setTimeEditing(false); base.current = 0; setElapsed(0); };
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
   const displayTime = running || elapsed > 0 ? elapsed : time;
+  const openTimeEdit = () => {
+    if (running) return;
+    setTimeDraft(String(Math.round(displayTime)));
+    setTimeEditing(true);
+  };
+  const commitTimeEdit = () => {
+    if (cancelTimeEdit.current) {
+      cancelTimeEdit.current = false;
+      setTimeEditing(false);
+      setTimeDraft('');
+      return;
+    }
+    setTimeEditing(false);
+    const n = parseFloat(timeDraft);
+    if (!Number.isNaN(n)) {
+      const next = Math.max(0, Math.min(300, Math.round(n)));
+      setTime(next);
+      if (elapsed > 0) {
+        setElapsed(next);
+        base.current = next;
+      }
+    }
+  };
 
   /* ── dial geometry ── */
   const p = PARAMS[active], v = vals[active];
@@ -169,7 +195,30 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, letterSpacing: '0.1em', fontFamily: 'var(--mono)', color: running ? 'rgba(255,255,255,0.55)' : C.taupe }}>萃取计时 · TIME</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 1 }}>
-              <span className="cd-num" style={{ fontSize: 38, fontWeight: 500, color: running ? '#fff' : C.ink, lineHeight: 1 }}>{displayTime.toFixed(running ? 1 : 0)}</span>
+              {timeEditing ? (
+                <input
+                  autoFocus
+                  type="text"
+                  inputMode="numeric"
+                  value={timeDraft}
+                  onChange={(e) => setTimeDraft(e.target.value.replace(/[^0-9.]/g, ''))}
+                  onBlur={commitTimeEdit}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') e.currentTarget.blur();
+                    if (e.key === 'Escape') { cancelTimeEdit.current = true; e.currentTarget.blur(); }
+                  }}
+                  className="cd-num"
+                  style={{ width: 82, fontSize: 38, fontWeight: 500, color: C.ink, lineHeight: 1,
+                    background: 'transparent', border: 'none', borderBottom: `2px solid ${C.caramel}`,
+                    outline: 'none', padding: 0 }}
+                />
+              ) : (
+                <button onClick={openTimeEdit} disabled={running} className="cd-num" aria-label="修改萃取时间"
+                  style={{ fontSize: 38, fontWeight: 500, color: running ? '#fff' : C.ink, lineHeight: 1,
+                    padding: 0, cursor: running ? 'default' : 'text' }}>
+                  {displayTime.toFixed(running ? 1 : 0)}
+                </button>
+              )}
               <span style={{ fontSize: 13, color: running ? 'rgba(255,255,255,0.5)' : C.taupe, fontFamily: 'var(--mono)' }}>s →参数</span>
             </div>
           </div>

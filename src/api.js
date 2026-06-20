@@ -27,6 +27,9 @@ export async function deleteBrew(id) {
   const { error } = await supabase.from('brews').delete().eq('id', id);
   if (error) throw error;
 }
+export async function updateBrew(id, patch) {
+  return unwrap(await supabase.from('brews').update(patch).eq('id', id).select().single());
+}
 
 /* ── drinks ── */
 export async function createDrink(drink) {
