@@ -22,7 +22,7 @@ export function HistoryScreen({ beans, brews, onDeleteBrew, onEditBrew }) {
   return (
     <>
       <Bar title="冲煮日志" sub={`${total} 杯 · 平均 ${avg} 分`} />
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 18px 20px' }}>
+      <div className="cd-scroll">
         {/* summary strip */}
         <div style={{ display: 'flex', gap: 0, background: C.ink, borderRadius: 16, overflow: 'hidden', marginBottom: 16 }}>
           {[['本周', brews.length, '杯'], ['平均分', avg, ''], ['最常用', mostUsed(beans, brews), '']].map(([l, val, u], i) => (

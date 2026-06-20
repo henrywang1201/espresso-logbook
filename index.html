@@ -2,9 +2,10 @@
 <html lang="zh">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, minimum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <title>espresso-logbook · 意式冲煮记录</title>
     <meta name="description" content="意式浓缩冲煮记录 — 拨盘录参、萃取计时、配方小抄、历史与豆子库。" />
+    <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
 
     <!-- PWA / theming -->
     <!-- theme-color matches the app's top surface so the iOS/Android status bar
@@ -33,9 +34,9 @@
     <style>
       /* Cream base so the safe-area / status-bar region never shows a mismatched
          strip on notch / Dynamic Island phones in standalone mode. */
-      html, body { margin: 0; padding: 0; height: 100%; background: #fcf8f1; overflow: hidden; }
-      body { background: #fcf8f1; }
-      #root { height: 100%; }
+      html, body { margin: 0; padding: 0; height: 100%; min-height: 100svh; background: #f1e8da; overflow: hidden; }
+      body { background: #f1e8da; overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
+      #root { height: 100%; min-height: 100svh; background: #f1e8da; }
     </style>
   </head>
   <body>

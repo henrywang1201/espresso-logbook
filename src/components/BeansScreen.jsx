@@ -13,7 +13,7 @@ export function BeansScreen({ beans, brews, currentBean, setCurrentBean, setTab,
   return (
     <>
       <Bar title="豆子库" sub={`${beans.length} 款在用`} right={<RoundBtn solid onClick={() => setForm({ mode: 'create' })}><Plus/></RoundBtn>} />
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 18px 20px' }}>
+      <div className="cd-scroll">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {beans.map((b) => {
             const st = beanStats(brews, b.id);

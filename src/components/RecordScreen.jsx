@@ -114,7 +114,7 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
   return (
     <>
       <Bar title="记录一杯" sub="ESPRESSO" right={<RoundBtn><Dots3/></RoundBtn>} />
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0 18px 18px' }}>
+      <div className="cd-scroll cd-scroll--with-footer">
 
         {/* bean selector */}
         <button onClick={() => setPickBean(true)} style={{
@@ -297,7 +297,7 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
       </div>
 
       {/* save */}
-      <div style={{ flex: '0 0 auto', padding: '10px 18px 14px', background: C.bg }}>
+      <div className="cd-action-footer">
         <button onClick={doSave} style={{ width: '100%', padding: '15px', borderRadius: 16, background: C.caramel, color: '#fff',
           fontSize: 16, fontWeight: 600, boxShadow: '0 8px 20px rgba(169,106,57,0.3)' }}>保存这一杯</button>
       </div>
@@ -311,9 +311,9 @@ export function RecordScreen({ beans, currentBean, setCurrentBean, onSave }) {
 /* bean picker bottom sheet */
 function BeanPicker({ beans, current, onPick, onClose }) {
   return (
-    <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 30, background: 'rgba(42,33,26,0.4)',
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 30, background: 'rgba(42,33,26,0.4)',
       display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backdropFilter: 'blur(2px)' }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: C.bg, borderRadius: '24px 24px 0 0', padding: '10px 18px 30px', maxHeight: '76%', overflowY: 'auto' }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: C.bg, borderRadius: '24px 24px 0 0', padding: '10px 18px calc(30px + env(safe-area-inset-bottom, 0px))', maxHeight: '76%', overflowY: 'auto' }}>
         <div style={{ width: 40, height: 4, borderRadius: 2, background: C.line, margin: '4px auto 14px' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
           <span style={{ fontFamily: 'var(--serif)', fontSize: 18, fontWeight: 600 }}>选择咖啡豆</span>

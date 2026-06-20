@@ -1,21 +1,41 @@
 // espresso-logbook — responsive app shell + bottom nav + shared bits
+import { useEffect } from 'react';
 import { C, ratioOf } from '../theme.js';
 
 export { ratioOf };
 
+function useViewportHeightVar() {
+  useEffect(() => {
+    const setViewportHeight = () => {
+      const h = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty('--cd-viewport-height', `${Math.round(h)}px`);
+    };
+
+    setViewportHeight();
+    window.visualViewport?.addEventListener('resize', setViewportHeight);
+    window.visualViewport?.addEventListener('scroll', setViewportHeight);
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', setViewportHeight);
+    window.addEventListener('pageshow', setViewportHeight);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', setViewportHeight);
+      window.visualViewport?.removeEventListener('scroll', setViewportHeight);
+      window.removeEventListener('resize', setViewportHeight);
+      window.removeEventListener('orientationchange', setViewportHeight);
+      window.removeEventListener('pageshow', setViewportHeight);
+    };
+  }, []);
+}
+
 /* Responsive app surface: edge-to-edge on phones, a centered comfortable
    column on tablet/desktop (no device bezel, no fake status bar). */
 export function AppShell({ children }) {
+  useViewportHeightVar();
+
   return (
     <div className="cd-viewport">
-      {/* Pin the shell to the full viewport surface, then center + width-cap it
-          so the app stays edge-to-edge on phones and comfortable on larger screens. */}
-      <div className="cd-shell" style={{
-        position: 'absolute', top: 0, bottom: 0, left: '50%', transform: 'translateX(-50%)',
-        width: '100%', maxWidth: 480, boxSizing: 'border-box',
-        display: 'flex', flexDirection: 'column', overflow: 'hidden', background: C.bg,
-        paddingTop: 'env(safe-area-inset-top)',
-      }}>
+      <div className="cd-shell">
         {children}
       </div>
     </div>
@@ -36,12 +56,15 @@ export function BottomNav({ tab, setTab }) {
         {NAV.map((n) => {
           const on = n.id === tab;
           return (
-            <button key={n.id} onClick={() => setTab(n.id)} style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '8px 0',
-              color: on ? C.caramel : C.taupe, transition: 'color .16s',
-            }}>
+            <button
+              key={n.id}
+              aria-current={on ? 'page' : undefined}
+              className="cd-bottom-nav-button"
+              onClick={() => setTab(n.id)}
+              style={{ color: on ? C.caramel : C.taupe }}
+            >
               {n.icon(on)}
-              <span style={{ fontSize: 11, fontWeight: on ? 700 : 500 }}>{n.label}</span>
+              <span>{n.label}</span>
             </button>
           );
         })}
@@ -113,7 +136,7 @@ export function Sheet({ children, onClose }) {
     <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 30, background: 'rgba(42,33,26,0.42)',
       display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backdropFilter: 'blur(2px)' }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: C.bg, borderRadius: '24px 24px 0 0',
-        padding: '10px 20px 30px', maxHeight: '90%', overflowY: 'auto' }}>
+        padding: '10px 20px calc(30px + env(safe-area-inset-bottom, 0px))', maxHeight: '90%', overflowY: 'auto' }}>
         <div style={{ width: 40, height: 4, borderRadius: 2, background: C.line, margin: '4px auto 16px' }} />
         {children}
       </div>
